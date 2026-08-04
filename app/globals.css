@@ -1,0 +1,194 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Sotto tokens.
+
+   Named by role, never by colour. If a value is not in this block it does not
+   get used anywhere in the product. There is no gray-500 here.
+
+   See docs/spec.md sections 1, 2 and 4.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Colour ---------------------------------------------------------------
+     Role names, never colour names. Mapped into Tailwind's --color-*
+     namespace by the @theme inline block below. */
+  --ground: #f1f0ee; /* page ground, flat, no shadow */
+  --plane: #fafaf9; /* every raised surface */
+  --ink: #17181a; /* type and the primary button */
+  --muted: #6e7075; /* secondary type */
+  --seal: #2e4739; /* two places only, see below */
+
+  /* Duration -------------------------------------------------------------
+     Not a Tailwind namespace, so these live here and are the values the
+     reduced motion block at the bottom of this file overrides. */
+  --duration-standard: 220ms;
+  --duration-spring: 420ms;
+  --duration-seal: 700ms;
+  --stagger: 85ms;
+}
+
+/* Tailwind v4 theme.
+
+   v4 replaced tailwind.config.ts with these in-CSS blocks. Token names match
+   the config excerpt in the spec.
+
+   Everything whose token name collides with a Tailwind namespace key carries
+   its literal value here rather than pointing at a :root copy. --shadow-*,
+   --radius-*, --ease-* and --font-* are all Tailwind namespaces, so writing
+   `--shadow-rest: var(--shadow-rest)` would be a variable pointing at itself,
+   and the utility would silently compile to a transparent shadow. @theme
+   emits each of these onto :root anyway, so var(--shadow-rest) and the
+   shadow-rest utility both work and there is still exactly one definition. */
+@theme {
+  /* Elevation. Three planes and no more. Each is a contact shadow plus an
+     ambient one. No blur, no glass: on a light ground glass turns to mud and
+     costs framerate on the phones this actually runs on. */
+  --shadow-rest: 0 1px 2px rgba(23, 24, 26, 0.04), 0 12px 32px -8px rgba(23, 24, 26, 0.08);
+  --shadow-lift: 0 1px 2px rgba(23, 24, 26, 0.05), 0 24px 48px -10px rgba(23, 24, 26, 0.16);
+  --shadow-fly: 0 2px 4px rgba(23, 24, 26, 0.05), 0 30px 60px -12px rgba(23, 24, 26, 0.22);
+
+  /* Radius belongs to the component. The plane is defined by fill + shadow. */
+  --radius-card: 28px;
+  --radius-small: 22px;
+  --radius-pill: 999px;
+
+  /* Three moves: tilt, spring, stagger. Everything else is standard at 220ms.
+     The seal is the only thing allowed to run longer. */
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* One family for the entire product. A display serif is forbidden: the
+     product's whole argument is that it is not performing at the guest.
+
+     'General Sans' is the specified family and is loaded from public/fonts
+     when those files exist. --font-substitute is Plus Jakarta Sans, wired in
+     app/layout.tsx, and is what renders until they land. See docs/spec.md 3. */
+  --font-sans: 'General Sans', var(--font-substitute), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* `inline` keeps these utilities pointing at the live :root properties above
+   rather than copying their values. No name collision here, so the indirection
+   is safe and the colours stay overridable from one place. */
+@theme inline {
+  --color-ground: var(--ground);
+  --color-plane: var(--plane);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-seal: var(--seal);
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+
+html {
+  /* The textarea must never zoom the viewport on iOS, which means no type in
+     this product goes below 16px at the root. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Visible keyboard focus everywhere. Never removed, only restyled for the one
+   surface it would disappear against. */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.on-ink:focus-visible {
+  outline-color: var(--plane);
+}
+
+/* ---------------------------------------------------------------------------
+   Type scale. See docs/spec.md 3.
+   --------------------------------------------------------------------------- */
+
+.t-question {
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.t-body {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.t-label {
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.t-button {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.t-chip {
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.t-example {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.t-undo {
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 400;
+  color: var(--muted);
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion.
+
+   Built in here from the first component rather than bolted on at the end.
+   Every duration collapses to 1ms and every delay to 0. Framer Motion reads
+   the same preference through lib/motion.ts, and the ring pulse is dropped
+   there entirely rather than shortened: a ring that expands in 1ms is a flash,
+   and a flash is worse than nothing.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-standard: 1ms;
+    --duration-spring: 1ms;
+    --duration-seal: 1ms;
+    --stagger: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}

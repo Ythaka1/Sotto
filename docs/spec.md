@@ -134,34 +134,41 @@ there is no third thing.
 
 ### Tailwind theme extension
 
-```ts
-// tailwind.config.ts (excerpt)
-theme: {
-  extend: {
-    colors: {
-      ground: 'var(--ground)',
-      plane:  'var(--plane)',
-      ink:    'var(--ink)',
-      muted:  'var(--muted)',
-      seal:   'var(--seal)',
-    },
-    boxShadow: {
-      rest: 'var(--shadow-rest)',
-      lift: 'var(--shadow-lift)',
-      fly:  'var(--shadow-fly)',
-    },
-    borderRadius: {
-      card:  'var(--r-card)',
-      small: 'var(--r-small)',
-      pill:  'var(--r-pill)',
-    },
-    transitionTimingFunction: {
-      standard: 'var(--ease-standard)',
-      spring:   'var(--ease-spring)',
-    },
-  },
+Tailwind 4 replaced `tailwind.config.ts` with an in CSS `@theme` block, so the theme lives
+in `app/globals.css` alongside the tokens. The names are the same either way.
+
+```css
+@theme {
+  --shadow-rest: 0 1px 2px rgba(23,24,26,.04), 0 12px 32px -8px rgba(23,24,26,.08);
+  --shadow-lift: 0 1px 2px rgba(23,24,26,.05), 0 24px 48px -10px rgba(23,24,26,.16);
+  --shadow-fly:  0 2px 4px rgba(23,24,26,.05), 0 30px 60px -12px rgba(23,24,26,.22);
+  --radius-card: 28px;
+  --radius-small: 22px;
+  --radius-pill: 999px;
+  --ease-standard: cubic-bezier(.22, 1, .36, 1);
+  --ease-spring:   cubic-bezier(.34, 1.56, .64, 1);
+  --font-sans: 'General Sans', var(--font-substitute), ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-plane:  var(--plane);
+  --color-ink:    var(--ink);
+  --color-muted:  var(--muted);
+  --color-seal:   var(--seal);
 }
 ```
+
+**Why the two blocks differ.** `--shadow-*`, `--radius-*`, `--ease-*` and `--font-*` are
+Tailwind namespace keys. Writing `--shadow-rest: var(--shadow-rest)` there would point a
+variable at itself, and the utility compiles to a transparent shadow with no error at
+build time or in the browser. So anything whose token name collides with a namespace
+carries its literal value in `@theme`, which emits it onto `:root` anyway. Colours do not
+collide, because Tailwind's key is `--color-ground` and the token is `--ground`, so those
+keep the `inline` indirection and stay overridable from one place.
+
+Durations are not a Tailwind namespace, so `--duration-*` and `--stagger` live in `:root`.
+That is what lets the reduced motion media query override them.
 
 There is no `gray-500` in this product. If a colour is not one of the five above, it does
 not get used.
