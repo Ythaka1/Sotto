@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PlanesDemo } from './PlanesDemo';
+import { SealDemo } from './SealDemo';
 
 export const metadata: Metadata = { title: 'Sotto kitchen' };
 
@@ -144,6 +145,10 @@ export default function Kitchen() {
 
       <Section title="Elevation, live">
         <PlanesDemo />
+      </Section>
+
+      <Section title="The seal">
+        <SealDemo />
       </Section>
 
       <Section title="Radius">
