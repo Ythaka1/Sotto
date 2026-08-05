@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { PlanesDemo } from './PlanesDemo';
 
 export const metadata: Metadata = { title: 'Sotto kitchen' };
 
@@ -139,6 +140,10 @@ export default function Kitchen() {
           Three planes and no more. No blur and no glass anywhere: on a ground this light
           glass turns to mud, and it costs framerate on the phones this actually runs on.
         </p>
+      </Section>
+
+      <Section title="Elevation, live">
+        <PlanesDemo />
       </Section>
 
       <Section title="Radius">
