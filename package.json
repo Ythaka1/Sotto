@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsc lib/room.ts --target es2022 --module esnext --moduleResolution bundler --outDir .testbuild && mv .testbuild/room.js lib/room.compiled.mjs && node --test lib/*.test.mjs"
   },
   "dependencies": {
     "framer-motion": "12.43.0",

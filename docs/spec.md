@@ -559,6 +559,7 @@ Supabase, one `responses` table.
 create table responses (
   id                 uuid primary key default gen_random_uuid(),
   property_slug      text        not null,
+  room               text,                 -- from ?r= on the folio QR, null if absent
   answer             text        not null,
   follow_up_question text,
   follow_up_answer   text,
@@ -582,18 +583,61 @@ so the fallback's accuracy is measurable rather than assumed.
 Writes go through a server route with the service role key. No Supabase key of any kind
 reaches the browser.
 
+### The room parameter
+
+The QR code printed on the folio is per room, not per property. It encodes:
+
+```
+/f/the-aubrey?r=14
+```
+
+`r` is read from the query string on arrival, held in session state for the length of the
+flow, and written to `responses.room`. It is never shown to the guest and never asked for.
+The folio already knows the room, so asking would be the interface explaining itself.
+
+**Why this is load bearing.** Without it the recovery offer is not actionable. Telling
+Daniel that a guest somewhere in the building is upset and would like to be found before
+they leave is not an intercept, it is a riddle. The room number is the difference between
+a duty manager walking to a door and a duty manager reading an email.
+
+Rules:
+
+- Absent or unparseable `r` is not an error and never blocks the flow. The row stores null.
+- Accept up to 8 characters matching `^[A-Za-z0-9-]{1,8}$` so that `14`, `2B` and `Suite-3`
+  all work. Anything else is treated as absent rather than stored dirty.
+- The value is echoed nowhere in the guest UI, so a mistyped QR cannot confuse a guest.
+
+**The tension, stated once.** Attaching a room number makes the response identifiable to
+the manager. That is the point, and it is what makes recovery possible. It also means the
+product must never claim the answer is anonymous, only that it is private and unpublished.
+The screen 0 privacy line says "goes straight to the general manager and is never
+published", which stays true. No copy anywhere may upgrade that to anonymity.
+
 ### Email
 
 Resend, to the manager's inbox, one email per guest, sent server side after the write.
 Subject and body come from the model call. Subject line pattern:
 
 ```
-The Aubrey: <theme>, room not given
+The Aubrey, room 14: <theme>
 ```
 
+When `r` is absent the room clause is **omitted entirely**:
+
+```
+The Aubrey: <theme>
+```
+
+The subject never asserts an absence. A line reading "room not given" on every email is
+noise that trains the manager to skim the subject, and it makes the common case look like
+a fault. Say the room when it is known and say nothing when it is not.
+
+When recovery is accepted the room moves to the front of the body as well, because that is
+the one fact Daniel acts on and he is reading it on a phone while walking.
+
 The email obeys the copy rules. It does not apologise on the property's behalf and it does
-not editorialise. It states what the guest said, the theme, the severity, whether recovery
-was offered and accepted, and the time.
+not editorialise. It states the room when known, what the guest said, the theme, the
+severity, whether recovery was offered and accepted, and the time.
 
 ### File tree
 
@@ -613,6 +657,7 @@ components/
   RecoveryOffer.tsx
 lib/
   motion.ts                     duration helper, reduced motion, variants
+  room.ts                       ?r= parsing, email subject
   respond.ts                    three tier: scripted, model, fallback
   severity.ts                   local heuristic
   groq.ts
