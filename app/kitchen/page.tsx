@@ -28,26 +28,26 @@ const planes = [
     box: 'shadow-rest rounded-card',
     radius: '28px',
     holds: 'Question card, chips, primary button, back chevron',
-    contact: '0 1px 2px rgba(23,24,26,.04)',
-    ambient: '0 12px 32px -8px rgba(23,24,26,.08)',
+    contact: '0 1px 2px rgba(28,22,18,.04)',
+    ambient: '0 12px 32px -8px rgba(28,22,18,.08)',
   },
   {
     name: 'Plane 2',
     token: 'lift',
     box: 'shadow-lift rounded-card',
     radius: '28px',
-    holds: 'Focused textarea, the sealed card, the recovery offer',
-    contact: '0 1px 2px rgba(23,24,26,.05)',
-    ambient: '0 24px 48px -10px rgba(23,24,26,.16)',
+    holds: 'Focused textarea, the sealed note, the recovery offer',
+    contact: '0 1px 2px rgba(28,22,18,.05)',
+    ambient: '0 28px 56px -12px rgba(28,22,18,.16)',
   },
   {
     name: 'Plane 3',
     token: 'fly',
     box: 'shadow-fly rounded-small',
     radius: '22px',
-    holds: 'Airborne example cards only. Transient. Nothing rests here.',
-    contact: '0 2px 4px rgba(23,24,26,.05)',
-    ambient: '0 30px 60px -12px rgba(23,24,26,.22)',
+    holds: 'Airborne example cards and the note at apex. Transient.',
+    contact: '0 2px 4px rgba(28,22,18,.05)',
+    ambient: '0 30px 60px -12px rgba(28,22,18,.22)',
   },
 ];
 
@@ -65,7 +65,7 @@ const motion = [
   { name: '--ease-spring', value: 'cubic-bezier(.34, 1.56, .64, 1)', use: 'Anything that arrives or is pressed' },
   { name: '--duration-standard', value: '220ms', use: 'The default' },
   { name: '--duration-spring', value: '420ms', use: 'Arrivals' },
-  { name: '--duration-seal', value: '700ms', use: 'The flap. The only long one.' },
+  { name: '--duration-seal', value: '1180ms', use: "The note's travel. The only long one." },
   { name: '--stagger', value: '85ms', use: 'Grouped elements, never together' },
 ];
 

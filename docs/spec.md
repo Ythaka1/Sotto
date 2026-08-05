@@ -50,9 +50,13 @@ The ground is the ground, not a plane. It never carries a shadow.
 | | Fill | Default radius | Contact shadow | Ambient shadow |
 |---|---|---|---|---|
 | **Ground** | `--ground` `#F1F0EE` | `0` | none | none |
-| **Plane 1: rest** | `--plane` `#FAFAF9` | `28px` | `0 1px 2px rgba(23,24,26,.04)` | `0 12px 32px -8px rgba(23,24,26,.08)` |
-| **Plane 2: lift** | `--plane` `#FAFAF9` | `28px` | `0 1px 2px rgba(23,24,26,.05)` | `0 24px 48px -10px rgba(23,24,26,.16)` |
-| **Plane 3: fly** | `--plane` `#FAFAF9` | `22px` | `0 2px 4px rgba(23,24,26,.05)` | `0 30px 60px -12px rgba(23,24,26,.22)` |
+| **Plane 1: rest** | `--plane` `#FAFAF9` | `28px` | `0 1px 2px rgba(28,22,18,.04)` | `0 12px 32px -8px rgba(28,22,18,.08)` |
+| **Plane 2: lift** | `--plane` `#FAFAF9` | `28px` | `0 1px 2px rgba(28,22,18,.05)` | `0 28px 56px -12px rgba(28,22,18,.16)` |
+| **Plane 3: fly** | `--plane` `#FAFAF9` | `22px` | `0 2px 4px rgba(28,22,18,.05)` | `0 30px 60px -12px rgba(28,22,18,.22)` |
+
+Shadow colour is `rgba(28,22,18,...)`, a warm near black. A cool shadow cast onto a ground
+this warm reads as dirty rather than soft. Alphas are unchanged and no new colour enters
+the product: this is a shadow, not a fill.
 
 Radius belongs to the component, not the plane. The plane is defined by its fill and its
 pair of shadows. Component radii:
@@ -67,14 +71,18 @@ pair of shadows. Component radii:
 **Ground.** The page. Never raised, never shadowed.
 
 **Plane 1, rest.** The question card. The follow up card. The chips. The primary button
-(fill is `--ink`, not `--plane`, the shadow pair is rest). The back chevron. The sealed
-card before it seals.
+(fill is `--ink`, not `--plane`, the shadow pair is rest). The back chevron. The note
+before it lifts, and both halves of the pocket.
 
-**Plane 2, lift.** The textarea card while focused. The sealed card from the moment the
-flap closes. The recovery offer.
+**Plane 2, lift.** The textarea card while focused. The recovery offer.
 
 **Plane 3, fly.** The three example cards on screen 0 while they are airborne, for the
-duration of their entry only. They land on plane 1. Nothing sits on plane 3 at rest.
+duration of their entry only. They land on plane 1. The note at the apex of its arc.
+Nothing sits on plane 3 at rest.
+
+The note's landed shadow, `0 6px 12px -8px rgba(28,22,18,.34)`, is not a fourth plane. It
+is a contact shadow with no ambient half, which is what a thing inside a pocket casts once
+the light stops reaching under it. A plane needs both halves. This has one, on purpose.
 
 Plane 3 is a transient. If something is still on plane 3 after 800ms, that is a bug.
 
@@ -101,22 +109,22 @@ CSS custom properties on `:root`, named by role.
   --seal:    #2E4739;  /* two places only */
 
   /* Elevation */
-  --shadow-rest: 0 1px 2px rgba(23,24,26,.04), 0 12px 32px -8px rgba(23,24,26,.08);
-  --shadow-lift: 0 1px 2px rgba(23,24,26,.05), 0 24px 48px -10px rgba(23,24,26,.16);
-  --shadow-fly:  0 2px 4px rgba(23,24,26,.05), 0 30px 60px -12px rgba(23,24,26,.22);
+  --shadow-rest: 0 1px 2px rgba(28,22,18,.04), 0 12px 32px -8px rgba(28,22,18,.08);
+  --shadow-lift: 0 1px 2px rgba(28,22,18,.05), 0 28px 56px -12px rgba(28,22,18,.16);
+  --shadow-fly:  0 2px 4px rgba(28,22,18,.05), 0 30px 60px -12px rgba(28,22,18,.22);
 
   /* Radius */
-  --r-card:  28px;
-  --r-small: 22px;
-  --r-pill:  999px;
+  --radius-card:  28px;
+  --radius-small: 22px;
+  --radius-pill:  999px;
 
   /* Motion */
   --ease-standard: cubic-bezier(.22, 1, .36, 1);
   --ease-spring:   cubic-bezier(.34, 1.56, .64, 1);
-  --dur-standard:  220ms;
-  --dur-spring:    420ms;
-  --dur-seal:      700ms;
-  --stagger:       85ms;
+  --duration-standard: 220ms;
+  --duration-spring:   420ms;
+  --duration-seal:    1180ms;  /* the note's travel, the longest single move */
+  --stagger:            85ms;
 }
 ```
 
@@ -139,9 +147,9 @@ in `app/globals.css` alongside the tokens. The names are the same either way.
 
 ```css
 @theme {
-  --shadow-rest: 0 1px 2px rgba(23,24,26,.04), 0 12px 32px -8px rgba(23,24,26,.08);
-  --shadow-lift: 0 1px 2px rgba(23,24,26,.05), 0 24px 48px -10px rgba(23,24,26,.16);
-  --shadow-fly:  0 2px 4px rgba(23,24,26,.05), 0 30px 60px -12px rgba(23,24,26,.22);
+  --shadow-rest: 0 1px 2px rgba(28,22,18,.04), 0 12px 32px -8px rgba(28,22,18,.08);
+  --shadow-lift: 0 1px 2px rgba(28,22,18,.05), 0 28px 56px -12px rgba(28,22,18,.16);
+  --shadow-fly:  0 2px 4px rgba(28,22,18,.05), 0 30px 60px -12px rgba(28,22,18,.22);
   --radius-card: 28px;
   --radius-small: 22px;
   --radius-pill: 999px;
@@ -309,26 +317,87 @@ T.2 only, no extra treatment: the branch in wording should be invisible as a mec
 This is the signature. It is the only place the motion budget gets spent. `t` is measured
 from the press of "Send privately".
 
+**The seal is a post, not a fold.** There is no flap, no `rotateX`, no `perspective`, no
+crease and no backface concern. Nothing rotates on the X axis anywhere in this product.
+
+An earlier draft folded a lid closed over the words. That fails twice. It is invisible,
+because a `--plane` flap closing over a `--plane` card with no lighting model is the same
+image as a blank rectangle wiping downward. And making it visible would not save it: a lid
+closing in place has no journey in it. Nothing travels anywhere.
+
+The guest's words are on a note. The note lifts off the surface, shrinks, tilts, and drops
+into a pocket, landing **behind** the pocket's front lip so it is genuinely inside
+something rather than sitting on top of it. The lip squashes on impact and springs back.
+Only then does the mark press in.
+
+#### Structure
+
+Three elements inside a relatively positioned wrapper 272px tall. No perspective.
+
+| Element | z-index | Notes |
+|---|---|---|
+| `.pocket-back` | 0 | plane 1, radius 26px, full pocket footprint |
+| `.note` | 1 | plane 1, radius 22px, holds the guest's text |
+| `.pocket-front` | 2 | the lip, 78px tall, sits at the pocket's bottom |
+
+The z-order is the whole illusion. If the note lands in front of the lip it reads as a
+card sitting on a rectangle and the moment dies. This is asserted in the audit, not left
+to inspection.
+
+The lip casts **upward**: `0 -12px 26px -14px rgba(28,22,18,.28)`, plus
+`inset 0 1px 0 rgba(255,255,255,.9)` for the top edge catch. A downward shadow there gives
+you two flat rectangles.
+
+#### Timing
+
 | # | Element | Trigger | Delay | Duration | Easing | From → to |
 |---|---|---|---|---|---|---|
 | 3.1 | Send button | press | 0 | 180ms | spring | `scale 1 → .97 → 1` |
-| 3.2 | **Flap** | press | 0 | **700ms** | standard | `rotateX(-92deg) → rotateX(0)`, `transform-origin: top center`, parent `perspective: 1200px`, `backface-visibility: hidden` |
-| 3.3 | Card body | press | 0 | 700ms | standard | `y 0 → -5px`, shadow `rest → lift` |
-| 3.4 | Pine mark | press | 540ms | 420ms | spring | `scale .4 → 1`, `rotate -8deg → 0`, `opacity 0 → 1` |
-| 3.5 | Ring | press | 620ms | 900ms | standard | `scale .55 → 2.3`, `opacity .45 → 0`, once, no repeat |
-| 3.6 | Sealed line | press | 900ms | 220ms | standard | `y 10 → 0`, `opacity 0 → 1` |
-| 3.7 | Undo | press | 985ms | 220ms | standard | `y 10 → 0`, `opacity 0 → 1` |
-| 3.8 | Recovery offer, serious only | press | 1300ms | 480ms | spring | `y 24 → 0`, `rotate 4deg → 0`, `scale .96 → 1`, shadow `lift` |
+| 3.2 | Note text | press | 200ms | 260ms | standard | `opacity 1 → 0` |
+| 3.3 | Note | press | 120ms | 1180ms | spring | four stop keyframe, below |
+| 3.4 | Pocket lip | press | 940ms | 620ms | spring | `scaleY 1 → 1.07 → 1`, `y 0 → -4 → 0`, origin bottom |
+| 3.5 | Pine mark | press | 1120ms | 520ms | spring | `scale .3 → 1`, `rotate -8deg → 0`, `opacity 0 → 1` |
+| 3.6 | Ring | press | 1220ms | 900ms | standard | `scale 1 → 3`, `opacity .5 → 0`, once |
+| 3.7 | Sealed line and Undo | press | 1460ms | 440ms | standard | `y 10 → 0`, `opacity 0 → 1` |
+| 3.8 | Recovery offer, serious only | press | 1700ms | 460ms | spring | `y 24 → 0`, `scale .96 → 1` |
 
-The flap and the lift run together on the same 700ms so the card reads as one object
-closing, not as a lid and a box. The mark lands at 540ms, while the flap is still moving,
-which is what makes it feel pressed into the closing card rather than stamped onto a
-finished one.
+Row 3.3, the note, in four stops:
 
-Screenshot checkpoints for the isolated component at `/kitchen`: **0ms** (open, flat,
-words visible), **350ms** (flap at roughly half fold, words half covered), **700ms**
-(closed and lifted, mark landed, ring mid pulse), **1200ms** (ring gone, sealed line and
-Undo in place).
+```
+0%    translateY(0)     scale(1)    rotate(0deg)    shadow: rest
+20%   translateY(-16px) scale(1.02) rotate(0deg)    shadow: fly
+46%   translateY(-8px)  scale(.72)  rotate(-4deg)   shadow: fly
+100%  translateY(132px) scale(.72)  rotate(-1deg)   shadow: 0 6px 12px -8px rgba(28,22,18,.34)
+```
+
+The shadow tightening at the last stop is what sells the descent. A note dropping into a
+pocket loses its ambient shadow and keeps only a close contact one, because the light stops
+reaching under it.
+
+The lip's catch starts at 940ms while the note is still on its last 360ms of travel. The
+overlap is deliberate: the lip reacts before the note has fully settled, which is what
+makes the pocket feel like it received something rather than played an animation next to
+it.
+
+Total arc is about 2.2 seconds. That is long for UI and correct here. Sealing something is
+supposed to take a moment, and that pause is the product telling the guest their words went
+somewhere private without a sentence of copy doing the work.
+
+#### Screenshot checkpoints at `/kitchen`
+
+**0ms** note flat with words visible, **300ms** note at apex with fly shadow, **800ms**
+note mid descent and shrunk, **1200ms** note landed behind the lip, **1600ms** mark in and
+ring mid pulse, **2200ms** complete.
+
+#### Build it as a swappable layer
+
+Later the last 400ms will hand off to a pre rendered image sequence of a brass folio clip
+closing over the note: photoreal light and material at the cost of one image decode, which
+is how the reference video gets its depth. Not now, and no WebGL ever on the guest path.
+
+`Seal.tsx` puts the closing beat in a single child component behind one prop,
+`closure: 'css' | 'sequence'`, defaulting to `css`. The CSS version is built completely.
+The closing beat is not welded into the parent's keyframes.
 
 ### Screen 4, close
 
@@ -347,10 +416,10 @@ component reads from. There is no component that animates without going through 
 
 - Every duration collapses to **1ms**. Every delay collapses to **0**.
 - Every stagger collapses to **0**.
-- The **ring pulse (3.5) is dropped entirely**, not shortened. A ring that expands in 1ms
-  is a flash, and a flash is worse than nothing.
-- The flap (3.2) renders in its **closed** state immediately. The seal still happens, it
-  just does not perform.
+- The **ring (3.6) is dropped entirely**, not shortened. A ring that expands in 1ms is a
+  flash, and a flash is worse than nothing.
+- The **note renders at its final position inside the pocket immediately**. The mark is
+  present. The seal still happens, it just does not perform.
 - Opacity transitions are kept at 1ms rather than removed, so nothing pops in without
   having existed.
 
@@ -375,7 +444,14 @@ Heading:  Before you go, one quiet question.
 Privacy:  ● Thirty seconds. It goes straight to the general manager and is never
             published.
 Button:   Start
+Exit:     Nothing to report
 ```
+
+**The exit is not optional.** Screen 0 offering only Start, with screen 1's Continue
+disabled until there is text, traps a guest who had a genuinely good stay. They leave, and
+the product records nothing. A quiet text link sits under the primary button on screens 0
+and 1 and goes straight to screen 4. It is recorded: `severity` `'none'`, `answer` null, no
+model call.
 
 The `●` is the 6px `--seal` dot. Example card copy, seeded for The Aubrey:
 
@@ -413,6 +489,9 @@ the field with an editable starter sentence and puts the cursor at the end:
 Continue is disabled until there is text. Disabled means `opacity .4` and
 `pointer-events: none`, and it is still in the tab order with `aria-disabled`, so a
 keyboard or screen reader guest is told why rather than finding a dead control.
+
+Under the button, the exit: `Nothing comes to mind`. Straight to screen 4, recorded the
+same way as screen 0's.
 
 Back chevron top left, 38px circular plane.
 
@@ -487,7 +566,9 @@ Full button inventory, so this stays honest:
 | Screen | Button | Says |
 |---|---|---|
 | 0 | primary | Start |
+| 0 | text exit | Nothing to report |
 | 1 | primary | Continue |
+| 1 | text exit | Nothing comes to mind |
 | 2 | primary | Send privately |
 | 3 | text | Undo |
 | 3 | recovery yes | Yes, please |
@@ -508,12 +589,15 @@ tier.
 
 ```ts
 type Verdict = {
-  severity: 'serious' | 'minor';
+  severity: 'serious' | 'minor' | 'none';
   theme: string;        // short noun phrase, lowercase
   summary: string;      // one sentence for the manager
   recoverable: boolean; // can a duty manager still fix this in the lobby
 };
 ```
+
+`'none'` is never returned by the model. It is set locally on the nothing to report path,
+where no model call fires at all.
 
 That same call writes the manager email body.
 
@@ -523,15 +607,33 @@ on severity. So:
 
 - **Screen 2 wording** uses a local heuristic, synchronously, with no network call. Tier 1.
 - **The model call fires the moment "Send privately" is pressed**, concurrently with the
-  seal animation. The flap takes 700ms and the recovery offer does not appear until
-  1300ms, which gives the call a 1.3 second budget on an 8b model that typically answers
-  in well under that.
-- **If the verdict has not arrived by 1300ms**, the recovery offer falls back to the local
-  heuristic and the flow continues without a pause. The verdict is still awaited in the
-  background for the email and the stored row.
+  seal. The recovery offer does not appear until 1700ms, which gives the call a 1.7 second
+  budget on an 8b model that typically answers in well under that.
+- **If the verdict has not arrived by 1700ms**, the recovery offer falls back to the local
+  heuristic and the flow continues without a pause.
 
-The seal animation is not decoration hiding latency. It happens to be exactly long enough
-to cover it, which is the reason it can afford to be the one slow thing in the product.
+The seal is not decoration hiding latency. It happens to be exactly long enough to cover
+it, which is the reason it can afford to be the one slow thing in the product.
+
+### Two routes, because Undo has to be true
+
+Screen 3 promises "nothing has left the device" and offers Undo. A single `/api/seal` that
+classified, wrote the row and sent the email on press would make that promise false. Both
+cannot be true, so the work splits:
+
+| Route | Fires | Does | Does not |
+|---|---|---|---|
+| `POST /api/verdict` | on press of "Send privately" | classifies, returns the `Verdict` | write anything, send anything |
+| `POST /api/commit` | when the undo window closes | writes the row, sends the email | call the model again |
+
+Still one model call per guest, so this stays inside the free tier.
+
+**The undo window** is the 2.2 seconds of the seal plus 6 seconds of the sealed line being
+on screen. If the guest presses Undo, the verdict is discarded and nothing is written. If
+they navigate on or the window elapses, commit fires.
+
+The recovery offer at 1700ms reads the verdict from the `/api/verdict` response, which by
+then has had 1.7 seconds, and falls back to the local heuristic if it has not arrived.
 
 ### The three tier `respond()` pattern
 
@@ -560,10 +662,10 @@ create table responses (
   id                 uuid primary key default gen_random_uuid(),
   property_slug      text        not null,
   room               text,                 -- from ?r= on the folio QR, null if absent
-  answer             text        not null,
+  answer             text,                 -- null on the nothing to report path
   follow_up_question text,
   follow_up_answer   text,
-  severity           text        not null check (severity in ('serious','minor')),
+  severity           text        not null check (severity in ('serious','minor','none')),
   theme              text,
   summary            text,
   recoverable        boolean     not null default false,
@@ -572,6 +674,11 @@ create table responses (
   created_at         timestamptz not null default now()
 );
 ```
+
+`answer` is nullable and `severity` accepts `'none'` so the nothing to report path has a
+row of its own. A guest who explicitly says nothing went wrong is real signal, and it is
+not the same event as an abandoned session. Collapsing the two would make the product
+unable to tell a good stay from a guest who walked away.
 
 `recovery_requested` is nullable on purpose: null means the offer was never shown, false
 means it was shown and declined. Those are different facts and collapsing them would lose
@@ -645,15 +752,18 @@ severity, whether recovery was offered and accepted, and the time.
 app/
   f/[property]/page.tsx         guest flow, client orchestrator
   kitchen/page.tsx              planes, swatches, seal in isolation
-  api/seal/route.ts             verdict + write + email, one POST
+  api/verdict/route.ts          classify only, writes nothing
+  api/commit/route.ts           write the row, send the email
 components/
   Plane.tsx                     the three planes, one component
   ExampleCard.tsx               screen 0 flying cards
   QuestionCard.tsx              textarea card, focus lift
   Chips.tsx
   PrimaryButton.tsx
+  QuietExit.tsx                 nothing to report, screens 0 and 1
   BackChevron.tsx
-  Seal.tsx                      the flap, mark, ring, sealed line
+  Seal.tsx                      note, pocket, mark, ring, sealed line
+  Closure.tsx                   the closing beat, closure: 'css' | 'sequence'
   RecoveryOffer.tsx
 lib/
   motion.ts                     duration helper, reduced motion, variants
