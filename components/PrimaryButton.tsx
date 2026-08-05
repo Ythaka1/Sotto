@@ -18,11 +18,14 @@ export function PrimaryButton({
   onClick,
   disabled = false,
   type = 'button',
+  describedBy,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   type?: 'button' | 'submit';
+  /** Points at the hidden line explaining why the button is not yet live. */
+  describedBy?: string;
 }) {
   const t = useTiming();
 
@@ -34,6 +37,7 @@ export function PrimaryButton({
          a keyboard or screen reader guest is told why instead of finding a dead
          control. */
       aria-disabled={disabled}
+      aria-describedby={disabled ? describedBy : undefined}
       whileTap={disabled ? undefined : { scale: 0.97 }}
       animate={{ opacity: disabled ? 0.4 : 1 }}
       transition={{
