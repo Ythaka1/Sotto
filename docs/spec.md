@@ -805,17 +805,29 @@ sells.
 
 Small steps, screenshot each one before moving on.
 
-1. **This spec.** Then stop and wait.
-2. Tokens as CSS custom properties plus the Tailwind theme extension. Screenshot a swatch
-   sheet.
-3. The three planes as a live demo page at `/kitchen`. Screenshot.
-4. Screen 0 with the fly in. Screenshot. This is where the product either feels alive or
-   feels like a form, so iterate until it does.
-5. Screens 1 and 2, back chevron included.
-6. The seal component in isolation at `/kitchen`. Screenshot at 0ms, 350ms, 700ms, 1200ms.
-7. Wire the flow together.
-8. Groq, Supabase, Resend.
-9. Seed The Aubrey and deploy to Vercel.
+1. ~~This spec.~~ Done.
+2. ~~Tokens as CSS custom properties plus the Tailwind theme extension.~~ Done.
+3. ~~The three planes as a live demo page at `/kitchen`.~~ Done.
+4. ~~Screen 0 with the fly in.~~ Done.
+5. ~~Screens 1 and 2, back chevron included.~~ Done.
+6. ~~The seal in isolation at `/kitchen`.~~ Done. Filmstrip at 0, 300, 800, 1200, 1600
+   and 2200ms.
+7. ~~Wire the flow together.~~ Done, including the undo window and the beacon commit.
+8. Groq, Supabase, Resend. **Code complete and unit tested. Not yet run against live
+   services:** no API keys exist in this environment, so every path has been exercised
+   against the fallbacks rather than the real providers.
+9. Seed The Aubrey and deploy to Vercel. **Seed and QR sheet done. Deploy and the phone
+   smoke test are outstanding** and need credentials plus a physical handset.
+
+### What is verified and what is not
+
+Verified: every code path, including the ones that fire when Groq is unreachable, slow, or
+returns a shape we do not trust. The browser suite drives the real flow and asserts on what
+crossed the wire.
+
+Not verified: that a real Groq key returns a verdict this parser accepts, that the Supabase
+insert matches the live table, that Resend delivers, and that a printed code scans from a
+folio under lobby lighting. The first three need credentials. The last needs a camera.
 
 ---
 

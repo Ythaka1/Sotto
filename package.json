@@ -8,20 +8,23 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "tsc lib/room.ts lib/severity.ts --target es2022 --module esnext --moduleResolution bundler --outDir .testbuild && for f in room severity; do mv .testbuild/$f.js lib/$f.compiled.mjs; done && node --test lib/*.test.mjs",
-    "test:ui": "node test/tokens.mjs && node test/screen0.mjs && node test/screens12.mjs && node test/seal.mjs"
+    "test": "tsc -p tsconfig.test.json && node scripts/prepare-tests.mjs && node --test lib/*.test.mjs",
+    "test:ui": "node test/tokens.mjs && node test/screen0.mjs && node test/screens12.mjs && node test/seal.mjs && node test/flow.mjs && node test/qr.mjs && node test/secrets.mjs"
   },
   "dependencies": {
     "framer-motion": "12.43.0",
     "next": "15.5.22",
+    "qrcode": "^1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "24.10.1",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
+    "jsqr": "^1.4.0",
     "playwright": "^1.62.1",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3"
